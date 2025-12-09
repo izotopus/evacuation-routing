@@ -213,7 +213,7 @@ export const MapView: React.FC = () => {
             <Popup>
               <strong>Trasa:</strong>
               <br/> Długość: {(state.route.properties.pathLengthMeters / 1000).toFixed(2)} km
-              <br/> Unikano ryzyka: {state.route.properties.riskPenaltyApplied ? 'TAK' : 'NIE'}
+              <br/> Wejście na obszar zalania: {state.route.properties.riskPenaltyApplied ? 'TAK' : 'NIE'}
               <br/> Koszt: {state.route.properties.totalWeightedCost.toFixed(2)}
             </Popup>
           </GeoJSON>

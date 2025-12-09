@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf';
 import { logger } from '@utils/logger';
 import { Feature, LineString } from 'geojson'; 
-import { findShortestPath } from '@utils/dijkstra';
+import { findShortestPath } from '@utils/dijkstra-priorityQueue';
 import { findClosestGraphNode } from '@utils/geometry';
 import { 
   modifyGraphForRisk, 
