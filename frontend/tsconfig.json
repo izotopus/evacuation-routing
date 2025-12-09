@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["vite/client"],
+    "lib": ["DOM", "ES2020"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

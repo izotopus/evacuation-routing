@@ -1,0 +1,52 @@
+{
+  "name": "evacuation-backend",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": ["evacuation", "dijkstra", "routing", "geojson", "turf", "geospatial", "typescript", "express", "flood-zones"],
+  "author": "Marcin Nowak <mnk@o2.pl>",
+  "homepage": "https://github.com/izotopus/evacuation-routing",
+  "license": "CC-BY-NC-SA-4.0",
+  "description": "System ewakuacji powodziowej (Backend API). Serwis Node.js/Express do przetwarzania GeoJSON i obliczania optymalnych tras ewakuacyjnych za pomocą zmodyfikowanego algorytmu Dijkstry.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node -r module-alias/register dist/server.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node -r tsconfig-paths/register src/server.ts",
+    "lint": "eslint 'src/**/*.ts'",
+    "test": "jest"
+  },
+  "_moduleAliases": {
+    "@root": "dist",
+    "@controllers": "dist/controllers",
+    "@loaders": "dist/loaders",
+    "@middlewares": "dist/middlewares",
+    "@routes": "dist/routes",
+    "@services": "dist/services",
+    "@interfaces": "dist/interfaces",
+    "@utils": "dist/utils"
+  },
+  "devDependencies": {
+    "@turf/turf": "^7.3.1",
+    "@types/express": "^5.0.6",
+    "@types/geojson": "^7946.0.16",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.39.1",
+    "express": "^5.2.1",
+    "geojson": "^0.5.0",
+    "geojson-rbush": "^3.2.0",
+    "install": "^0.13.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.11",
+    "npm": "^11.6.4",
+    "prettier": "^3.7.4",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "module-alias": "^2.2.3"
+  }
+}

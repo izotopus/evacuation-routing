@@ -1,0 +1,146 @@
+# 🌊 System Ewakuacji Powodziowej (Backend)
+
+Ten backend jest serwerem Node.js/Express odpowiedzialnym za ładowanie danych GeoJSON (dróg i stref zalewowych), budowę grafu sieci drogowego oraz obliczanie optymalnych tras ewakuacyjnych z uwzględnieniem kosztów ryzyka powodziowego (algorytm Dijkstry).
+
+## 📚 Główne Biblioteki GeoSpatial
+
+Projekt opiera się na dwóch kluczowych bibliotekach do przetwarzania danych geograficznych:
+
+| Biblioteka | Zastosowanie w projekcie | Opis |
+| :--- | :--- | :--- |
+| **@turf/turf** | **Obliczenia i przetwarzanie GeoJSON** | Biblioteka do zaawansowanych operacji geoprzestrzennych. Używana do: <br> • **Obliczania długości** segmentów drogowych (koszt krawędzi). <br> • **Obliczania BBOX** (obwiedni) załadowanych danych. <br> • **Snappingu** punktów start/end do najbliższych segmentów drogowych. |
+| **geojson** | **Definicje typów GeoJSON** | Zbiór interfejsów TypeScript. Używany wyłącznie do zapewnienia **silnego typowania** dla wszystkich struktur danych GeoJSON (np. `Feature`, `LineString`, `Polygon`, `FeatureCollection`), co zwiększa bezpieczeństwo i czytelność kodu. |
+
+## 🚀 Uruchomienie Projektu
+
+### Wymagania wstępne
+
+* Node.js (v18+)
+* npm lub yarn
+
+### Instalacja i Start
+
+1.  **Przejdź do katalogu `backend/`**
+
+2.  **Instalacja zależności:**
+    ```bash
+    npm install
+    ```
+
+3.  **Uruchomienie w trybie deweloperskim (z hot-reloadem):**
+    ```bash
+    npm run dev
+    ```
+    Serwer uruchomi się na porcie `3000` (http://localhost:3000).
+
+4.  **Uruchomienie produkcyjne (po kompilacji):**
+    ```bash
+    npm run build
+    npm start
+    ```
+---
+
+## 🌐 Uruchomienie Frontendu
+
+Po upewnieniu się, że serwer backendu działa, możesz uruchomić aplikację kliencką:
+
+1.  **Otwórz nowy terminal** i **przejdź do katalogu `frontend/`**.
+2.  **Zainstaluj zależności frontendu (jeśli jeszcze tego nie zrobiono):**
+    ```bash
+    npm install
+    ```
+3.  **Uruchom aplikację kliencką (Frontend):**
+    ```bash
+    npm run dev
+    ```
+    Aplikacja frontendu uruchomi się zazwyczaj na porcie `5173` (lub innym wolnym porcie Vite, np. http://localhost:5173). Możesz teraz otworzyć ten adres w przeglądarce.
+
+---
+
+## 🗺️ Struktura Danych GeoJSON
+
+Aplikacja wymaga, aby w katalogu **`backend/data/`** znajdowały się następujące pliki:
+
+| Plik | Typ Geometrii | Wymagane Właściwości (`properties`) | Źródło Generowania |
+| :--- | :--- | :--- | :--- |
+| **`roads.geojson`** | `LineString` | Brak specyficznych, ale muszą być poprawne cechy drogowe. | **Overpass Turbo** (`https://overpass-turbo.eu/`) |
+| **`flood.geojson`** | `Polygon` | **`risk_cost: number`** | **GeoJSON.io** (`https://geojson.io/`) |
+
+---
+
+**Opis:**
+
+* **`roads.geojson`**: Zawiera sieć dróg, używaną do budowy Grafu.
+* **`flood.geojson`**: Zawiera symulowane strefy zalewowe. Wartość `risk_cost` jest dodawana do kosztu krawędzi podczas routingu.
+
+## 📡 Testowe Wywołania API
+
+Wszystkie endpointy są dostępne pod bazowym adresem `/api/evac`.
+
+| Endpoint | Metoda | Opis |
+| :--- | :--- | :--- |
+| `/api/evac/route` | `GET` | Oblicza najkrótszą i najbezpieczniejszą trasę. |
+| `/api/evac/bbox` | `GET` | Zwraca obwiednię (BBOX) dla wszystkich dróg. |
+| `/api/evac/flood-zones` | `GET` | Zwraca wszystkie poligony stref zalewowych. |
+
+### 1. Obliczenie Trasy (Routing)
+
+**Zapytanie (przykład dla Otwocka):**
+Obliczenie trasy z punktu (52.13, 21.15) do (52.10, 21.18).
+
+```bash
+curl "http://localhost:3000/api/evac/route?start=52.13,21.15&end=52.10,21.18"
+```
+
+**Odpowiedź:**
+```json
+Odpowiedź: GeoJSON LineString z właściwościami zawierającymi całkowity koszt (totalWeightedCost) i długość.
+```
+
+### 2. Pobranie Obwiedni (BBOX)
+
+Zwraca obwiednię całej załadowanej sieci dróg. Używane przez frontend do inicjalizacji widoku mapy.
+
+| Endpoint | Metoda | Opis |
+| :--- | :--- | :--- |
+| `/api/evac/bbox` | `GET` | Zwraca minimalny prostokąt obejmujący wszystkie drogi. |
+
+**Odpowiedź:**
+```json
+{
+  "bbox": [minLon, minLat, maxLon, maxLat]
+}
+```
+
+### 3. Pobranie Stref Zalewowych
+
+Zwraca poligony stref zalewowych.
+
+| Endpoint | Metoda | Opis |
+| :--- | :--- | :--- |
+| `/api/evac/flood-zones` | `GET` | Zwraca GeoJSON FeatureCollection z poligonami. |
+
+**Odpowiedź:** 
+```json
+Odpowiedź: GeoJSON FeatureCollection z poligonami
+```
+
+## 🧪 Testy Jednostkowe (Unit Tests)
+
+Projekt wykorzystuje framework **Jest** do zapewnienia stabilności i poprawności kluczowych algorytmów.
+
+### Uruchomienie Testów
+
+Aby uruchomić wszystkie testy jednostkowe w katalogu `backend/`, użyj skryptu:
+
+```bash
+npm test
+```
+
+### Pokrycie Testowe
+
+Główne obszary pokryte testami to:
+
+* **Logika routingu (Dijkstra):** Sprawdzenie poprawności znajdowania najkrótszej ścieżki i kosztów, a także obsługa nieosiągalnych węzłów (`src/__tests__/dijkstra.test.ts`).
+* **Ładowanie Danych:** Weryfikacja, czy pliki GeoJSON są poprawnie wczytywane, a nieprawidłowe geometrie są odrzucane (`src/__tests__/loaders.test.ts`).
+* **Geoprocessing:** Testowanie poprawności obliczeń geograficznych, takich jak **Bounding Box (BBOX)** i budowanie indeksów przestrzennych **R-tree** dla stref zalewowych (`src/__tests__/geo.test.ts`).
