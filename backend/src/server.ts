@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv';
 import express from 'express';
 import { errorHandler } from '@middlewares/errorHandler';
 import { logger } from '@utils/logger';
@@ -9,6 +10,10 @@ import { calculateBbox } from '@utils/geometry';
 import { buildFloodIndex } from '@utils/flood';
 import { setLoadedData, FloodFeatures, RoadFeatures } from './config';
 import { routeController } from '@controllers/routeController';
+
+dotenv.config();
+
+const useDynamicFloodMapping = !!process.env.SENTINEL_HUB_CLIENT_ID && !!process.env.SENTINEL_HUB_CLIENT_SECRET;
 
 const PORT = 3000;
 const app = express();
@@ -47,7 +52,26 @@ async function startServer() {
   logger.info("SERVER", "🚀 Inicjalizacja Serwera Ewakuacji...");
 
   try {
+    // 1. Ładowanie Dróg (Wymagane do BBOX i Grafu)
     const { features: roadFeaturesGeoJSON, graph: roadsGraph } = loadRoads(); 
+    
+    // 2. Ładowanie Stref Powodziowych (nowa, asynchroniczna wersja)
+    logger.info("SERVER", `Ładowanie stref zalania. Tryb dynamiczny: ${useDynamicFloodMapping ? 'TAK (Sentinel Hub)' : 'NIE (Plik GeoJSON)'}`);
+
+    // Przekazujemy roadFeaturesGeoJSON do obliczenia BBOX wewnątrz loadFloodZones
+    const floodPolygons = await loadFloodZones(roadFeaturesGeoJSON, useDynamicFloodMapping);
+    
+    // 3. Budowanie Indeksu Powodziowego
+    const floodIndex = buildFloodIndex(floodPolygons);
+
+    // 4. Ustawienie Danych
+    setLoadedData(roadsGraph, roadFeaturesGeoJSON, floodPolygons, floodIndex);
+
+    app.listen(PORT, () => {
+      logger.info("SERVER", `✅ Serwer uruchomiony na http://localhost:${PORT}`);
+    });
+    
+    /* const { features: roadFeaturesGeoJSON, graph: roadsGraph } = loadRoads(); 
     
     const floodPolygons = loadFloodZones();
     const floodIndex = buildFloodIndex(floodPolygons);
@@ -56,7 +80,7 @@ async function startServer() {
 
     app.listen(PORT, () => {
       logger.info("SERVER", `✅ Serwer uruchomiony na http://localhost:${PORT}`);
-    });
+    }); */
 
   } catch (error) {
     logger.critical("SERVER", "❌ Krytyczny błąd podczas uruchamiania serwera:", error);

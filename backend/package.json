@@ -2,7 +2,17 @@
   "name": "evacuation-backend",
   "version": "1.0.0",
   "private": true,
-  "keywords": ["evacuation", "dijkstra", "routing", "geojson", "turf", "geospatial", "typescript", "express", "flood-zones"],
+  "keywords": [
+    "evacuation",
+    "dijkstra",
+    "routing",
+    "geojson",
+    "turf",
+    "geospatial",
+    "typescript",
+    "express",
+    "flood-zones"
+  ],
   "author": "Marcin Nowak <mnk@o2.pl>",
   "homepage": "https://github.com/izotopus/evacuation-routing",
   "license": "CC-BY-NC-SA-4.0",
@@ -47,6 +57,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "module-alias": "^2.2.3"
+    "geotiff": "^2.1.4-beta.1",
+    "marching-squares": "^1.0.0",
+    "module-alias": "^2.2.3",
+    "ndarray": "^1.0.19"
   }
 }

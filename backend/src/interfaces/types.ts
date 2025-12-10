@@ -25,3 +25,13 @@ export interface IGeoJsonRBushInstance {
     geojson: BBox | FeatureCollection<Geometry, GeoJsonProperties> | Feature<Geometry, GeoJsonProperties>
   ): FeatureCollection<Geometry, GeoJsonProperties>;
 }
+
+export interface FloodFeature extends GeoJSON.Feature {
+    geometry: GeoJSON.Polygon;
+    properties: {
+        risk_cost: number; // np. dodatkowy koszt za metr
+        [key: string]: any;
+    };
+}
+
+// export type BBox = [number, number, number, number];
