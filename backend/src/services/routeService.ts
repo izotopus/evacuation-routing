@@ -8,7 +8,7 @@ import {
   buildFloodIndex, 
 } from '@utils/flood'; 
 
-import { LoadedGraph, RoadFeatures, FloodFeatures } from '../config'; 
+import { LoadedGraph, RoadFeatures, FloodFeatures } from '../dataStore'; 
 import type { Coordinates, Graph } from '@interfaces/types';
 
 /**

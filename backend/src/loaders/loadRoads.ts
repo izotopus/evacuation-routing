@@ -5,8 +5,7 @@ import { logger } from '@utils/logger';
 import { FeatureCollection } from 'geojson'; 
 import type { Graph, RoadFeature } from '@interfaces/types';
 import { buildGraph } from '@utils/graph';
-
-const ROADS_FILE_PATH = path.join(process.cwd(), 'data', 'roads.geojson');
+import { ROADS_FILE_PATH } from '@root/config';
 
 export interface LoadedRoads {
   features: RoadFeature[];
