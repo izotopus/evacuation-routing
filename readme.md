@@ -1,4 +1,4 @@
-# 🌊 System Ewakuacji Powodziowej (Backend)
+# 🌊 System Ewakuacji Powodziowej
 
 Ten backend jest serwerem Node.js/Express odpowiedzialnym za ładowanie danych GeoJSON (dróg i stref zalewowych), budowę grafu sieci drogowego oraz obliczanie optymalnych tras ewakuacyjnych z uwzględnieniem kosztów ryzyka powodziowego (algorytm Dijkstry).
 
