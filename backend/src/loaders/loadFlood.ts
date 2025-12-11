@@ -7,8 +7,7 @@ import { calculateBbox } from '@utils/geometry';
 import { FloodPolygonFeature } from '@utils/flood';
 import type { RoadFeature, FloodFeature } from '@interfaces/types';
 import { fetchFloodData } from '@services/fetchFloodData';
-
-const FLOOD_FILE_PATH = path.join(process.cwd(), 'data', 'flood.geojson');
+import { FLOOD_FILE_PATH } from '@root/config';
 
 /**
  * Ładuje dane o strefach zalewowych.

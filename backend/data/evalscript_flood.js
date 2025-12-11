@@ -2,7 +2,6 @@
 // Author: Marcin Spiralski (https://www.linkedin.com/in/marcin-spiralski-19086783)
 // License: CC BY 4.0 International 
 
-
 function setup() {
   return {
     input: ["VH"],
@@ -18,8 +17,7 @@ function evaluatePixel(sample) {
 
   var VH_dB = 10 * Math.log10(VH);
 
-  var floodThreshold = -11;
-  // var floodThreshold = -21;
+  var floodThreshold = -12;
 
   if (VH_dB < floodThreshold) {
     return [0, 0, 1];

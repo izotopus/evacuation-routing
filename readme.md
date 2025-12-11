@@ -10,6 +10,57 @@ Projekt opiera się na dwóch kluczowych bibliotekach do przetwarzania danych ge
 | :--- | :--- | :--- |
 | **@turf/turf** | **Obliczenia i przetwarzanie GeoJSON** | Biblioteka do zaawansowanych operacji geoprzestrzennych. Używana do: <br> • **Obliczania długości** segmentów drogowych (koszt krawędzi). <br> • **Obliczania BBOX** (obwiedni) załadowanych danych. <br> • **Snappingu** punktów start/end do najbliższych segmentów drogowych. |
 | **geojson** | **Definicje typów GeoJSON** | Zbiór interfejsów TypeScript. Używany wyłącznie do zapewnienia **silnego typowania** dla wszystkich struktur danych GeoJSON (np. `Feature`, `LineString`, `Polygon`, `FeatureCollection`), co zwiększa bezpieczeństwo i czytelność kodu. |
+| **rbush** | **Indeksowanie Przestrzenne** | Wykorzystywana do budowy i utrzymywania **indeksu przestrzennego R-tree** (FloodIndex). Umożliwia bardzo szybkie sprawdzanie, czy dany segment drogi jest **zgodny z poligonem powodziowym** (detekcja kolizji). |
+
+
+## 🌍 Zarządzanie Źródłem Danych Powodziowych
+
+System obsługuje dwa tryby pobierania danych powodziowych:
+
+### 1. Tryb Lokalny (Domyślny)
+
+* **Aktywacja:** Domyślny, gdy zmienne `SENTINEL_HUB_CLIENT_ID` i `SENTINEL_HUB_CLIENT_SECRET` **nie są zdefiniowane** w pliku `.env`.
+* **Działanie:** System załaduje dane powodziowe z lokalnego pliku określonego w konfiguracji (`config.ts: FLOOD_FILE_PATH`). Ten plik musi być wcześniej wygenerowany (np. przez poprzednie uruchomienie serwisu) lub umieszczony ręcznie.
+* **Przeznaczenie:** Szybkie testowanie algorytmów routingu i unikanie opóźnień związanych z API.
+
+### 2. Tryb Sentinel Hub (Dynamiczne Pobieranie)
+
+* **Aktywacja:** Gdy **obie** zmienne `SENTINEL_HUB_CLIENT_ID` i `SENTINEL_HUB_CLIENT_SECRET` **są poprawnie zdefiniowane** w pliku `.env`.
+* **Działanie:** System automatycznie pobierze token autoryzacyjny, a następnie wyśle żądanie do API Sentinel Hub w celu uzyskania najnowszych danych powodziowych (w postaci GeoTIFF) dla zadanego obszaru BBOX. Następnie przetworzy te dane (CCL, scalanie, wygładzanie) i wykorzysta je do routingu.
+* **Przeznaczenie:** Praca z aktualnymi danymi satelitarnymi.
+
+
+## ⚙️ Konfiguracja i Zmienne Środowiskowe
+
+Projekt wykorzystuje zmienne środowiskowe do zarządzania danymi dostępowymi do zewnętrznych serwisów.
+
+Stwórz plik `.env` w katalogu głównym projektu i wypełnij go następującymi danymi:
+
+```env
+# --- Wymagane Dane Autoryzacyjne dla Sentinel Hub ---
+# Jeśli te zmienne są zdefiniowane, system automatycznie przełączy się na pobieranie 
+# aktualnych danych powodziowych z API Sentinel Hub.
+SENTINEL_HUB_CLIENT_ID="[Twój Client ID]"
+SENTINEL_HUB_CLIENT_SECRET="[Twój Secret]"
+```
+
+
+## 📄 Plik Konfiguracyjny Aplikacji (`config.ts`)
+
+Plik `config.ts` przechowuje **stałe, niezmienne parametry** niezbędne do działania serwisu oraz przetwarzania danych GeoTIFF na GeoJSON. Te wartości są traktowane jako twarde ustawienia aplikacji (w przeciwieństwie do zmiennych środowiskowych, które są danymi dostępowymi).
+
+### Kluczowe Ustawienia Zawarte w `config.ts`:
+
+| Stała | Cel | Wartość |
+| :--- | :--- | :--- |
+| `PROCESSING_API_URL` | Endpoint API do pobierania danych z Sentinel Hub. | URL |
+| `*_FILE_PATH` | Definicje ścieżek do lokalnych plików wejściowych i wyjściowych (np. `roads.geojson`, `flood.geojson`). | Ścieżka |
+| `BUFFER_TIFF` | Flaga logiczna sterująca zapisem pobranego GeoTIFF na dysk (dla debugowania). | `true` / `false` |
+| `MIN_PIXEL_AREA_THRESHOLD` | Próg dla algorytmu CCL (usuwanie szumu rastrowego). | Liczba pikseli |
+| `MIN_AREA_THRESHOLD_SQ_METERS` | Próg powierzchni dla scalonego poligonu (filtracja końcowa). | Wartość w $\text{m}^2$ |
+
+> **Uwaga:** Wszelkie zmiany w sposobie filtrowania danych powodziowych lub w geometrii (np. wygładzanie krawędzi) powinny być dokonywane poprzez modyfikację wartości w pliku `config.ts`.
+
 
 ## 🚀 Uruchomienie Projektu
 
@@ -22,18 +73,20 @@ Projekt opiera się na dwóch kluczowych bibliotekach do przetwarzania danych ge
 
 1.  **Przejdź do katalogu `backend/`**
 
-2.  **Instalacja zależności:**
+2.  **Uzupełnij plik `.env` danymi autoryzacyjnymi Sentinel Hub**, jeśli chcesz użyć aktualnych danych satelitarnych.
+
+3.  **Instalacja zależności:**
     ```bash
     npm install
     ```
 
-3.  **Uruchomienie w trybie deweloperskim (z hot-reloadem):**
+4.  **Uruchomienie w trybie deweloperskim (z hot-reloadem):**
     ```bash
     npm run dev
     ```
     Serwer uruchomi się na porcie `3000` (http://localhost:3000).
 
-4.  **Uruchomienie produkcyjne (po kompilacji):**
+5.  **Uruchomienie produkcyjne (po kompilacji):**
     ```bash
     npm run build
     npm start

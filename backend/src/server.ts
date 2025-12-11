@@ -8,7 +8,7 @@ import { loadFloodZones } from '@loaders/loadFlood';
 import { calculateBbox } from '@utils/geometry';
 
 import { buildFloodIndex } from '@utils/flood';
-import { setLoadedData, FloodFeatures, RoadFeatures } from './config';
+import { setLoadedData, FloodFeatures, RoadFeatures } from './dataStore';
 import { routeController } from '@controllers/routeController';
 
 dotenv.config();
