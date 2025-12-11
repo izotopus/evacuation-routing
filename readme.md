@@ -62,6 +62,21 @@ Plik `config.ts` przechowuje **stałe, niezmienne parametry** niezbędne do dzia
 > **Uwaga:** Wszelkie zmiany w sposobie filtrowania danych powodziowych lub w geometrii (np. wygładzanie krawędzi) powinny być dokonywane poprzez modyfikację wartości w pliku `config.ts`.
 
 
+## 📡 Skrypt Oceny Danych Satelitarnych (`evalscript_flood.js`)
+
+W katalogu `data/` znajduje się plik **`evalscript_flood.js`**. Jest to kluczowy element procesu pobierania danych Sentinel Hub.
+
+### Rola Evalscript
+
+`Evalscript` to specjalny skrypt JavaScript wykonywany po stronie serwera Sentinel Hub. Służy do:
+
+1.  **Wybór Pasm:** Określanie, które pasma satelitarne (np. krótkofalowa podczerwień, widzialne) mają być użyte.
+2.  **Indeksy Wodne:** Obliczanie na żywo wskaźników, takich jak **NDWI (Normalized Difference Water Index)**, które pomagają odróżnić wodę (powódź) od innych elementów krajobrazu.
+3.  **Wartości Wyjściowe:** Mapowanie wyników indeksów na konkretne wartości pikseli (np. 0 dla suchych obszarów, wartości $>0$ dla powodzi).
+
+Dzięki temu skryptowi, API Sentinel Hub zwraca nam nie surowe dane satelitarne, ale już **przetworzony GeoTIFF**, w którym każdy piksel ma precyzyjnie ustaloną wartość zalania.
+
+
 ## 🚀 Uruchomienie Projektu
 
 ### Wymagania wstępne
